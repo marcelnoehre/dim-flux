@@ -1,1 +1,36 @@
-# fca-bipolar-fdp
+# A Bipolar FDP-Model for Double Additive Drawings
+This repository implements a force-directed placement approach for the automated generation of
+Double Additive Concept Lattice drawings. By optimizing an initial layout that relies on the
+structural Supremum-Infimum distance, this approach aims to maximize the conflict distance between
+concepts and non-incident edges.
+
+## Usage
+Clone the repository and initialize the environment. uv will automatically create a virtual
+environment and sync dependencies based on the pyproject.toml. `uv` will automatically create a
+virtual environment.
+
+```bash
+uv sync
+```
+
+Execute the layout generation using uv run to ensure the correct environment context.
+```bash
+uv run python main.py
+```
+
+The script will prompt you for a lattice number corresponding to the `.cxt` files located in the
+`/data` directory.
+
+## Configuration
+| Category | Parameter | Description |
+| :--- | :--- | :--- |
+| **Drawings** | `plot_si_graph` | Visualize the Supremum-Infimum graph ($f_{max}$ is highlighted) |
+| | `plot_initial_layout` | Visualize the initial layout of the concept lattice |
+| | `plot_optimized_layout` | Visualize the final optimized layout of the concept lattice |
+| **Annotations** | `si_graph_annotations` | Display annotations in the SI-Graph |
+| | `initial_layout_annotations` | Display annotations in the initial drawing |
+| | `optimized_layout_annotations` | Display annotations in the final optimized drawing |
+| **Forces** | `plot_individual_forces` | Display force vectors for objects and attributes respectively |
+| | `plot_combined_forces` | Display combined force vectors |
+| | `plot_gradients` | Display gradient vectors at concepts |
+| **Dev** | `plot_origin` | Display the origin $(0,0)$ |

@@ -1,0 +1,17 @@
+[project]
+name = "fca-bipolar-fdp"
+version = "1.0.0"
+description = "A Bipolar FDP-Model for Double Additive Drawings"
+authors = [
+    { name = "marcelnoehre", email = "noehre@cs.uni-kassel.de" }
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fcapy>=0.1.4.5",
+    "networkx>=3.6.1",
+    "numpy>=2.4.2",
+    "python-sat>=1.8.dev30",
+    "sympy>=1.14.0",
+    "z3-solver>=4.16.0.0",
+]

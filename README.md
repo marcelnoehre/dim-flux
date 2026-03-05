@@ -1,8 +1,5 @@
-# A Bipolar FDP-Model for Double Additive Drawings
-This repository implements a force-directed placement approach for the automated generation of
-Double Additive Concept Lattice drawings. By optimizing an initial layout that relies on the
-structural Supremum-Infimum distance, this approach aims to maximize the conflict distance between
-concepts and non-incident edges.
+# DimFlux: Force-Directed Doubly-Additive Line Diagrams
+This repository implements a force-directed placement approach for doubly-additive line drawings.
 
 ## Usage
 Clone the repository and initialize the environment. uv will automatically create a virtual
@@ -34,3 +31,15 @@ The script will prompt you for a lattice number corresponding to the `.cxt` file
 | | `plot_combined_forces` | Display combined force vectors |
 | | `plot_gradients` | Display gradient vectors at concepts |
 | **Dev** | `plot_origin` | Display the origin $(0,0)$ |
+
+## License
+Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
+
+This work is licensed under a
+[Creative Commons Attribution 4.0 International License][cc-by].
+
+[![CC BY 4.0][cc-by-image]][cc-by]
+
+[cc-by]: http://creativecommons.org/licenses/by/4.0/
+[cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
+[cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg

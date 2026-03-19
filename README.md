@@ -1,6 +1,38 @@
 # DimFlux: Force-Directed Doubly-Additive Line Diagrams
 This repository implements a force-directed placement approach for doubly-additive line drawings.
 
+## References
+This project is based on the theory and methods described in the following works.
+
+### Primary Reference
+```bash
+@misc{nöhre2026dimfluxforcedirectedadditiveline,
+  title = {DimFlux: Force-Directed Additive Line Diagrams},
+  author = {Marcel Nöhre and Dominik Dürrschnabel and Bernhard Ganter and Gerd Stumme},
+  year = {2026},
+  eprint={2603.16366},
+  archivePrefix={arXiv},
+  primaryClass={cs.CG},
+  url={https://arxiv.org/abs/2603.16366}
+}
+```
+
+### Supplementary Material
+```bash
+@misc{nohre_2026_18936106,
+  author = {Nöhre, Marcel and Dürrschnabel, Dominik and Ganter, Bernhard and Stumme, Gerd},
+  title = {A Visual Benchmark of DimFlux: Comparison of Line Diagrams for Concept Lattices},
+  month = mar,
+  year = 2026,
+  publisher = {Zenodo},
+  doi = {10.5281/zenodo.18936106},
+  url = {https://doi.org/10.5281/zenodo.18936106}
+}
+```
+
+*If you use this code in your work, please cite the above references.*
+
+
 ## Usage
 Clone the repository and initialize the environment. uv will automatically create a virtual
 environment and sync dependencies based on the pyproject.toml. `uv` will automatically create a

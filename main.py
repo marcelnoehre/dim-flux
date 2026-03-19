@@ -1,5 +1,6 @@
 from src.utils.visualize import *
 from src.utils.variables import Variables
+from src.dim_flux.realizer import Realizer
 from src.fdp.sup_inf import SupInfGraph
 from src.fdp.init_layout import InitLayout
 from src.fdp.forces import ForceDirectedPlacement
@@ -13,30 +14,41 @@ def main():
         'initial_layout_annotations':  False,
         'plot_optimized_layout':  True,
         'optimized_layout_annotations':  False,
-        'plot_individual_forces':  True,
+        'plot_individual_forces':  False,
         'plot_combined_forces':  False,
         'plot_gradients':  False,
         'plot_origin':  False
     })
 
-    # Sup-Inf Graph
-    sup_inf_graph = SupInfGraph(vars)
-    vars.scalars = sup_inf_graph.scalars
-    vars.order = sup_inf_graph.order
-    vars.d_si_points = sup_inf_graph.d_si_points
-    vars.n_1 = sup_inf_graph.n_1
-    vars.n_2 = sup_inf_graph.n_2
+    mode = 'DimFlux' # 'PlanarityEnhancer'
 
-    if vars.args.plot_si_graph:
-        plot_si_graph(vars)
+    if mode == 'DimFlux':
+        realizer = Realizer(vars)
+        vars.base_vectors = realizer.base_vectors
+        vars.coordinates = realizer.coordinates
 
-    # Initial Layout
-    initial_layout = InitLayout(vars)
-    vars.base_vectors = initial_layout.base_vectors
-    vars.coordinates = initial_layout.coordinates
+        if vars.args.plot_initial_layout:
+            plot_lattice(vars, 'Initial layout (Projected DimDraw)', vars.args.initial_layout_annotations, False)
 
-    if vars.args.plot_initial_layout:
-        plot_lattice(vars, 'Initial layout', vars.args.initial_layout_annotations, False)
+    else:
+        # Sup-Inf Graph
+        sup_inf_graph = SupInfGraph(vars)
+        vars.scalars = sup_inf_graph.scalars
+        vars.order = sup_inf_graph.order
+        vars.d_si_points = sup_inf_graph.d_si_points
+        vars.n_1 = sup_inf_graph.n_1
+        vars.n_2 = sup_inf_graph.n_2
+
+        if vars.args.plot_si_graph:
+            plot_si_graph(vars)
+
+        # Initial Layout
+        initial_layout = InitLayout(vars)
+        vars.base_vectors = initial_layout.base_vectors
+        vars.coordinates = initial_layout.coordinates
+
+        if vars.args.plot_initial_layout:
+            plot_lattice(vars, 'Initial layout', vars.args.initial_layout_annotations, False)
 
     # Optimize Layout
     forces = ForceDirectedPlacement(vars)

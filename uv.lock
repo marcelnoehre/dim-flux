@@ -202,7 +202,7 @@ wheels = [
 ]
 
 [[package]]
-name = "fca-bipolar-fdp"
+name = "dim-flux"
 version = "1.0.0"
 source = { virtual = "." }
 dependencies = [

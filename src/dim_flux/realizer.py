@@ -42,8 +42,8 @@ class Realizer():
             self._store_coordinates()
         else:
             dim_draw = DimDraw(self.vars)
-            self.realizer = dim_draw.two_dimensional_extension()
-            self._store_coordinates()
+            self.coordinates = dim_draw.two_dimensional_extension()
+            self.vars.coordinates = self.coordinates
             projection = Projection(self.vars)
             self.vars.coordinates = projection.coordinates
             self._derive_base_vectors()

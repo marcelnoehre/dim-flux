@@ -115,3 +115,60 @@ def incomparability_graph(lattice: ConceptLattice) -> nx.Graph:
         The incomparability graph of the lattice.
     '''
     return nx.complement(nx.transitive_closure(lattice.to_networkx()).to_undirected())
+
+def _lectically_smaller(vars, intent_a: set, intent_b: set) -> bool:
+    '''
+    Check if concept A is lectically smaller than concept B.
+    
+    A <L B iff there exists an attribute m in M such that:
+        - m is the smallest attribute in (intent_b - intent_a) \cup (intent_a - intent_b)
+        - m \in intent_b (B contains it, A does not)
+
+    Parameters
+    ----------
+    intent_a : set
+        Intent of concept A
+    intent_b : set
+        Intent of concept B
+
+    Returns
+    -------
+    bool
+        True if A is lectically smaller than B
+    '''
+    if intent_a == intent_b:
+        return False
+    
+    for m in vars.attributes:
+        if m in intent_a and m in intent_b:
+            continue
+        if m not in intent_a and m not in intent_b:
+            continue
+        # m is the smallest differing element
+        # A <L B iff A does NOT contain m
+        return m not in intent_a
+    
+    return False
+
+def compute_lectic_order(vars) -> list:
+    '''
+    Sort all concepts by the lectic order on their intents.
+
+    Returns
+    -------
+    list
+        Concept IDs sorted lectically
+    '''
+    
+    concepts = list(vars.concepts)
+
+    for i in range(1, len(concepts)):
+        key = concepts[i]
+        key_intent = vars.intents[key]
+        j = i - 1
+        while j >= 0 and _lectically_smaller(vars, key_intent, vars.intents[concepts[j]]):
+            concepts[j + 1] = concepts[j]
+            j -= 1
+        concepts[j + 1] = key
+
+    return concepts

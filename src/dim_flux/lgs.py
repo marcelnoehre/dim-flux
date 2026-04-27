@@ -44,8 +44,9 @@ class LinearEquationSolver:
             elements = self.vars.extents[c] | (self.vars.M - self.vars.intents[c])
             for i, dim in enumerate(self.dimensions):
                 l, r = tuple(((' + '.join(f'{dim}_{v}' for v in elements) if elements else '0'), f'{self.coordinates[c][i]}'))
-                if f'{l} = {r}' != '0 = 0.0':
-                    self.equations.append(Eq(sympify(l), sympify(r)))
+                eq = Eq(sympify(l), sympify(r))
+                if eq != True:
+                    self.equations.append(eq)
             
     def _solve(self, dim: str, node: int, expected: int):
         '''

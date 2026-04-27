@@ -1,5 +1,6 @@
 import numpy as np
 
+from src.fca.lattice import compute_lectic_order
 from src.utils.variables import Variables
 
 class Projection():
@@ -15,66 +16,10 @@ class Projection():
             The storage of variables
         '''
         self.vars = variables
-        self.lectic_order = self._compute_lectic_order()
+        self.lectic_order = compute_lectic_order(self.vars)
         self._set_representation()
         self._orthonormal_basis()
         self._additive_coordinates()
-
-    def _lectically_smaller(self, intent_a: set, intent_b: set) -> bool:
-        '''
-        Check if concept A is lectically smaller than concept B.
-        
-        A <L B iff there exists an attribute m in M such that:
-            - m is the smallest attribute in (intent_b - intent_a) \cup (intent_a - intent_b)
-            - m \in intent_b (B contains it, A does not)
-
-        Parameters
-        ----------
-        intent_a : set
-            Intent of concept A
-        intent_b : set
-            Intent of concept B
-
-        Returns
-        -------
-        bool
-            True if A is lectically smaller than B
-        '''
-        if intent_a == intent_b:
-            return False
-        
-        for m in self.vars.attributes:
-            if m in intent_a and m in intent_b:
-                continue
-            if m not in intent_a and m not in intent_b:
-                continue
-            # m is the smallest differing element
-            # A <L B iff A does NOT contain m
-            return m not in intent_a
-        
-        return False
-    
-    def _compute_lectic_order(self) -> list:
-        '''
-        Sort all concepts by the lectic order on their intents.
-
-        Returns
-        -------
-        list
-            Concept IDs sorted lectically
-        '''
-        concepts = list(self.vars.concepts)
-
-        for i in range(1, len(concepts)):
-            key = concepts[i]
-            key_intent = self.vars.intents[key]
-            j = i - 1
-            while j >= 0 and self._lectically_smaller(key_intent, self.vars.intents[concepts[j]]):
-                concepts[j + 1] = concepts[j]
-                j -= 1
-            concepts[j + 1] = key
-
-        return concepts
 
     def _set_representation(self):
         '''

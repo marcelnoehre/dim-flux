@@ -1,19 +1,16 @@
 import numpy as np
+from pathlib import Path
 
+from odis import FormalContext
 from fcapy.lattice import ConceptLattice
 
 from src.utils.variables import Variables
-from src.dim_flux.dim_draw import DimDraw
+from src.fca.lattice import compute_lectic_order
 from src.dim_flux.projection import Projection
 from src.dim_flux.lgs import LinearEquationSolver
-from src.dim_flux.additive_realizer import AdditiveRealizer
 
 class Realizer():
     '''
-    Disclaimer
-    ----------
-    The original version is integrated into the tool conexp-clj [see https://github.com/tomhanika/conexp-clj].
-    
     Reference
     ---------
     @misc{dürrschnabel2019dimdrawnoveltool,
@@ -33,39 +30,34 @@ class Realizer():
         self.context = variables.context
         self.lattice = ConceptLattice.from_context(variables.context)
         
-        # check wether an additive 2D realizer exists
-        additive_realizer = AdditiveRealizer(self.context)
-        self.realizer = additive_realizer.realizer()
-        self.base_vectors = additive_realizer.base_vectors
-
-        if self.realizer:
-            self._store_coordinates()
-        else:
-            dim_draw = DimDraw(self.vars)
-            self.coordinates = dim_draw.two_dimensional_extension()
-            self.vars.coordinates = self.coordinates
-            projection = Projection(self.vars)
-            self.vars.coordinates = projection.coordinates
-            self._derive_base_vectors()
-
-    def _store_coordinates(self):
-        '''
-        Store coordinates after turning the diagram by 45degree to the left and stretching the
-        diagram horizontally by sqrt(2) and squeezing the diagram vertically by 1/sqrt(2).
-
-        Rotating, stretching and squeezing are linear transformations and therefore do not change the
-        status of a diagram of being additive or not.
-        '''
-        coords_array = np.array([[self.realizer[0].index(c), self.realizer[1].index(c)] for c in self.vars.concepts])
-        theta = np.radians(45)
-        c, s = np.cos(theta), np.sin(theta)
-        R = np.array(((c, -s), (s, c)))
-        rotated_coords = (coords_array @ R.T) * np.array([np.sqrt(2), 1/np.sqrt(2)])
-        self.coordinates = {
-            c: rotated_coords[c].tolist() 
-            for c in self.vars.concepts
-        }
+        self.coordinates = self.two_dimensional_extension()
         self.vars.coordinates = self.coordinates
+        projection = Projection(self.vars)
+        self.vars.coordinates = projection.coordinates
+        self._derive_base_vectors()
+
+    def two_dimensional_extension(self):
+        '''
+        Compute the two-dimensional extension of the lattice.
+
+        Returns
+        -------
+        coordinates : Dict[int, List]
+            Original DimDraw coordinates.
+        '''
+        if self.vars.cxt.endswith('.cxt'):
+            cxt_path = Path(self.vars.cxt).resolve()
+        else:
+            cxt_path = Path(f'data/{self.vars.cxt}.cxt').resolve()
+
+        ctx = FormalContext.from_file(str(cxt_path))
+        drawing = ctx.draw("dimdraw")
+        self.lectic_order = compute_lectic_order(self.vars)
+        self.coordinates = {
+            c: (np.array([drawing.nodes[i].x, drawing.nodes[i].y]) * -1 * np.array([np.sqrt(2), 1/np.sqrt(2)])).tolist()
+            for i, c in enumerate(self.lectic_order)
+        }
+        return self.coordinates
 
     def _derive_base_vectors(self):
         '''

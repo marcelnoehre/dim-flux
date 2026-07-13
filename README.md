@@ -6,20 +6,24 @@ This project is based on the theory and methods described in the following works
 
 ### Primary Reference
 ```bash
-@misc{nöhre2026dimfluxforcedirectedadditiveline,
-  title = {DimFlux: Force-Directed Additive Line Diagrams},
-  author = {Marcel Nöhre and Dominik Dürrschnabel and Bernhard Ganter and Gerd Stumme},
+@article{Noehre2026,
+  title = {DimFlux: Force-directed additive line diagrams},
+  journal = {International Journal of Approximate Reasoning},
+  volume = {197},
+  pages = {109734},
   year = {2026},
-  eprint={2603.16366},
-  archivePrefix={arXiv},
-  primaryClass={cs.CG},
-  url={https://arxiv.org/abs/2603.16366}
+  issn = {0888-613X},
+  doi = {https://doi.org/10.1016/j.ijar.2026.109734},
+  url = {https://www.sciencedirect.com/science/article/pii/S0888613X2600109X},
+  author = {Marcel Nöhre and Dominik Dürrschnabel and Bernhard Ganter and Gerd Stumme},
+  keywords = {Formal concept analysis, Force-directed placement, Additive line diagrams, DimDraw, DimFlux},
+  abstract = {The visualization of concept lattices is a central problem in the field of Formal Concept Analysis. Force-directed algorithms, as popular in graph drawing, are a promising approach, treating lattice diagrams as physical models, optimizing node positions based on forces derived from the lattice structure. We build on the work of Zschalig, who, however, limited himself to attribute-additive diagrams. We use a more general additivity, in which both the attributes and the objects contribute to the positions of the concept nodes. We replace the planarity enhancer used by Zschalig to obtain a starting diagram for force-directed optimization with the DimDraw algorithm, which generates structured order diagrams on its own. The combination results in DimFlux, an algorithm that leverages the advantages of DimDraw but generates additive diagrams in which readability is increased by maximizing the conflict distance between nodes and non-incident edges.}
 }
 ```
 
 ### Supplementary Material
 ```bash
-@misc{nohre_2026_18936106,
+@misc{Noehre2026Supplementary,
   author = {Nöhre, Marcel and Dürrschnabel, Dominik and Ganter, Bernhard and Stumme, Gerd},
   title = {A Visual Benchmark of DimFlux: Comparison of Line Diagrams for Concept Lattices},
   month = mar,
@@ -34,6 +38,20 @@ This project is based on the theory and methods described in the following works
 
 
 ## Usage
+
+### Install via PyPI
+Install the package from [PyPI](https://pypi.org/project/dim-flux/) using pip.
+
+```bash
+pip install dim-flux
+```
+
+Execute the layout generation using the `dim-flux` command.
+```bash
+dim-flux
+```
+
+### Install from source
 Clone the repository and initialize the environment. uv will automatically create a virtual
 environment and sync dependencies based on the pyproject.toml. `uv` will automatically create a
 virtual environment.
@@ -51,6 +69,26 @@ The script will prompt you for a path to a `.cxt` file.
 To export the node positions add the `--export` flag.
 ```bash
 uv run dim-flux --export
+```
+The `--export` flag also works with the PyPI install:
+```bash
+dim-flux --export
+```
+
+### Use as a library
+DimFlux can also be called directly from Python via `dim_flux.plot`.
+
+```python
+from dim_flux import plot
+
+# cxt can be a path to a .cxt file, or a pandas DataFrame representing the incidence matrix
+positions = plot('path/to/context.cxt')
+```
+
+By default `plot` returns the computed `(x, y)` coordinates in lectic order as a numpy array.
+Pass `export=True` to instead write the PDF, GraphML and `.pos` exports to disk.
+```python
+plot('path/to/context.cxt', export=True)
 ```
 
 ## Configuration

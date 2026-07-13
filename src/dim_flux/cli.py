@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 import pandas as pd
 
+from pathlib import Path
 from typing import Optional, Union
 from dim_flux.utils.visualize import *
 from dim_flux.utils.variables import Variables
@@ -10,7 +11,7 @@ from dim_flux.fdp.sup_inf import SupInfGraph
 from dim_flux.fdp.init_layout import InitLayout
 from dim_flux.fdp.forces import ForceDirectedPlacement
 
-def run(cxt: Union[str, pd.DataFrame], export: bool = False) -> Optional[np.ndarray]:
+def plot(cxt: Union[str, pd.DataFrame], export: bool = False) -> Optional[np.ndarray]:
     '''
     Run the DimFlux pipeline end to end.
 
@@ -87,7 +88,9 @@ def run(cxt: Union[str, pd.DataFrame], export: bool = False) -> Optional[np.ndar
         graphml_export(vars, 'm4')
         pos_export(vars, vars.cxt)
 
-    return np.array([vars.coordinates[c] for c in vars.lectic_order])
+    positions = np.array([vars.coordinates[c] for c in vars.lectic_order])
+    Path('input.cxt').unlink(missing_ok=True)
+    return positions
 
 
 def main():
@@ -99,7 +102,7 @@ def main():
     args = parser.parse_args()
 
     cxt = input('Path to .cxt file: ')
-    positions = run(cxt, export=args.export)
+    positions = plot(cxt, export=args.export)
     if positions is not None:
         print(positions)
 

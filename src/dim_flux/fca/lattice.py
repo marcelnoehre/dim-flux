@@ -117,7 +117,7 @@ def incomparability_graph(lattice: ConceptLattice) -> nx.Graph:
     return nx.complement(nx.transitive_closure(lattice.to_networkx()).to_undirected())
 
 def _lectically_smaller(vars, intent_a: set, intent_b: set) -> bool:
-    '''
+    r'''
     Check if concept A is lectically smaller than concept B.
     
     A <L B iff there exists an attribute m in M such that:

@@ -167,3 +167,4 @@ class Variables():
         self.base_vectors = dict({})
         self.coordinates = dict({})
         self.final_forces = dict({})
+        self.lectic_order = []

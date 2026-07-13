@@ -26,6 +26,7 @@ def main():
         realizer = Realizer(vars)
         vars.base_vectors = realizer.base_vectors
         vars.coordinates = realizer.coordinates
+        vars.lectic_order = realizer.lectic_order
 
         if vars.args.plot_initial_layout:
             plot_lattice(vars, 'Initial layout (Projected DimDraw)', vars.args.initial_layout_annotations, False)
@@ -62,6 +63,7 @@ def main():
         )
 
     pdf_export(vars, 'm4')
+    pos_export(vars, cxt)
 
 
 if __name__ == "__main__":

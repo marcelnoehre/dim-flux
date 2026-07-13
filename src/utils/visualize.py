@@ -175,6 +175,22 @@ def pdf_export(vars: Variables, prefix: str):
     plt.savefig(file, format='pdf', bbox_inches='tight')
     plt.close()
 
+def pos_export(vars: Variables, file_name: str):
+    '''
+    Export the node positions in lectic order.
+
+    Parameters
+    ----------
+    vars : Variables
+        The container class holding coordinates
+    file_name : str
+        file name for the .pos file
+
+    '''
+    pos = [f'{vars.coordinates[c][0]} {vars.coordinates[c][1]}' for c in vars.lectic_order]
+    with open(f'positions/{file_name}.pos', 'w', encoding='utf-8') as f:
+        f.write('\n'.join(pos))
+        
 def _plot_individual_forces(vars: Variables):
     '''
     Internal helper to draw force arrows (repulsive, attractive, gravitational) for each concept.

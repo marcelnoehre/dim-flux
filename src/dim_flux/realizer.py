@@ -35,6 +35,7 @@ class Realizer():
         projection = Projection(self.vars)
         self.vars.coordinates = projection.coordinates
         self._derive_base_vectors()
+        self.lectic_order = projection.lectic_order
 
     def two_dimensional_extension(self):
         '''

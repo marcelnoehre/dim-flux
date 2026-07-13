@@ -46,12 +46,7 @@ class Realizer():
         coordinates : Dict[int, List]
             Original DimDraw coordinates.
         '''
-        if self.vars.cxt.endswith('.cxt'):
-            cxt_path = Path(self.vars.cxt).resolve()
-        else:
-            cxt_path = Path(f'data/{self.vars.cxt}.cxt').resolve()
-
-        ctx = FormalContext.from_file(str(cxt_path))
+        ctx = FormalContext.from_file(str(Path('input.cxt').resolve()))
         drawing = ctx.draw("dimdraw")
         self.lectic_order = compute_lectic_order(self.vars)
         self.coordinates = {

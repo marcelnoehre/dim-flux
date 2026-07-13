@@ -47,8 +47,11 @@ Execute the layout generation using uv run to ensure the correct environment con
 uv run dim-flux
 ```
 
-The script will prompt you for a lattice number corresponding to the `.cxt` files located in the
-`/data` directory.
+The script will prompt you for a path to a `.cxt` file.
+To export the node positions add the `--export` flag.
+```bash
+uv run dim-flux --export
+```
 
 ## Configuration
 | Category | Parameter | Description |

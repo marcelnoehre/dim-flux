@@ -1,7 +1,9 @@
 import os
 import numpy as np
+import networkx as nx
 import matplotlib.pyplot as plt
 
+from typing import List, Tuple
 from itertools import combinations
 from dim_flux.utils.variables import Variables
 from dim_flux.fca.lattice import cover_relations
@@ -175,7 +177,34 @@ def pdf_export(vars: Variables, prefix: str):
     plt.savefig(file, format='pdf', bbox_inches='tight')
     plt.close()
 
-def pos_export(vars: Variables, file_name: str):
+def graphml_export(vars: Variables, prefix: str):
+    '''
+    Export the Concept Lattice as a GraphML file.
+
+    Parameters
+    ----------
+    vars : Variables
+        The container holding the lattice and coordinates
+    prefix : str
+        The subdirectory prefix for the output file
+    '''
+    graph = nx.DiGraph()
+    for concept in vars.concepts:
+        x, y = vars.coordinates[concept]
+        graph.add_node(
+            concept,
+            x=float(x),
+            y=float(y),
+            extent=','.join(vars.extents[concept]),
+            intent=','.join(vars.intents[concept])
+        )
+    graph.add_edges_from(cover_relations(vars.lattice))
+
+    file = f'results_{prefix}/{vars.cxt}.graphml'
+    os.makedirs(os.path.dirname(file), exist_ok=True)
+    nx.write_graphml(graph, file)
+
+def pos_export(vars: Variables, file_name: str) -> List[Tuple[float, float]]:
     '''
     Export the node positions in lectic order.
 
@@ -186,10 +215,16 @@ def pos_export(vars: Variables, file_name: str):
     file_name : str
         file name for the .pos file
 
+    Returns
+    -------
+    positions : List[Tuple[float, float]]
+        The (x, y) coordinates of each concept in lectic order
     '''
-    pos = [f'{vars.coordinates[c][0]} {vars.coordinates[c][1]}' for c in vars.lectic_order]
+    positions = [tuple(vars.coordinates[c]) for c in vars.lectic_order]
+    os.makedirs('positions', exist_ok=True)
     with open(f'positions/{file_name}.pos', 'w', encoding='utf-8') as f:
-        f.write('\n'.join(pos))
+        f.write('\n'.join(f'{x} {y}' for x, y in positions))
+    return positions
         
 def _plot_individual_forces(vars: Variables):
     '''

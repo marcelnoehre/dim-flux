@@ -1,7 +1,10 @@
 import numpy as np
+import pandas as pd
 
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 from dataclasses import dataclass
+from fcapy.context import FormalContext
 from fcapy.lattice import ConceptLattice
 
 from dim_flux.fca.context import *
@@ -28,8 +31,10 @@ class Variables():
 
     Parameters
     ----------
-    cxt : str
-        The filename or path of the formal context
+    cxt : str or pandas.DataFrame
+        A path to a .cxt file, or a pandas DataFrame representing the incidence matrix
+        (objects as rows, attributes as columns). A string not ending in `.cxt` raises
+        a ValueError.
     context : FormalContext
         The formal context decoded from the input file
     lattice : ConceptLattice
@@ -100,13 +105,24 @@ class Variables():
         Dictionary storing the resultant forces after optimization
     '''
 
-    def __init__(self, cxt: str, args: Optional[Dict[str, bool]]):
+    def __init__(self, cxt: Union[str, pd.DataFrame], args: Optional[Dict[str, bool]]):
 
-        self.cxt = cxt
-        if cxt.endswith('.cxt'):
-            self.context = decode_cxt(cxt)
+        if isinstance(cxt, pd.DataFrame):
+            self.cxt = 'input'
+            self.context = FormalContext.from_pandas(cxt)
         else:
-            self.context = decode_cxt(f'data/{cxt}.cxt')
+            if not cxt.endswith('.cxt'):
+                raise ValueError(f'Expected a path to a .cxt file, got: {cxt}')
+            self.context = decode_cxt(cxt)
+            self.cxt = Path(cxt).stem
+
+        # reduce context
+        reduced = reduce_context(self.context).to_pandas()
+        reduced.index = [f'g_{i + 1}' for i in range(len(reduced.index))]
+        reduced.columns = [f'm_{i + 1}' for i in range(len(reduced.columns))]
+        self.context = FormalContext.from_pandas(reduced)
+        self.context.write_cxt('input.cxt')
+
         self.lattice = ConceptLattice.from_context(self.context)
         self.args: Args = Args(**(args or {}))
 

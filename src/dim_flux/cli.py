@@ -1,3 +1,8 @@
+import argparse
+import numpy as np
+import pandas as pd
+
+from typing import Optional, Union
 from dim_flux.utils.visualize import *
 from dim_flux.utils.variables import Variables
 from dim_flux.core.realizer import Realizer
@@ -5,14 +10,29 @@ from dim_flux.fdp.sup_inf import SupInfGraph
 from dim_flux.fdp.init_layout import InitLayout
 from dim_flux.fdp.forces import ForceDirectedPlacement
 
-def main():
-    cxt = input('File Number:')
+def run(cxt: Union[str, pd.DataFrame], export: bool = False) -> Optional[np.ndarray]:
+    '''
+    Run the DimFlux pipeline end to end.
+
+    Parameters
+    ----------
+    cxt : str or pandas.DataFrame
+        A path to a .cxt file, or a pandas DataFrame representing the incidence matrix.
+    export : bool
+        If True, write the PDF, GraphML and .pos exports to disk and return None.
+        If False, skip all exports and return the computed positions instead.
+
+    Returns
+    -------
+    positions : Optional[np.ndarray]
+        The (x, y) coordinates of each concept in lectic order, or None if export is True.
+    '''
     vars = Variables(cxt, {
-        'plot_si_graph': True,
+        'plot_si_graph': False,
         'si_graph_annotations':  False,
-        'plot_initial_layout':  True,
+        'plot_initial_layout':  False,
         'initial_layout_annotations':  False,
-        'plot_optimized_layout':  True,
+        'plot_optimized_layout':  False,
         'optimized_layout_annotations':  False,
         'plot_individual_forces':  False,
         'plot_combined_forces':  False,
@@ -62,8 +82,26 @@ def main():
             vars.args.plot_individual_forces or vars.args.plot_combined_forces or vars.args.plot_gradients
         )
 
-    pdf_export(vars, 'm4')
-    pos_export(vars, cxt)
+    if export:
+        pdf_export(vars, 'm4')
+        graphml_export(vars, 'm4')
+        pos_export(vars, vars.cxt)
+
+    return np.array([vars.coordinates[c] for c in vars.lectic_order])
+
+
+def main():
+    parser = argparse.ArgumentParser(description='DimFlux: Force-Based Doubly-Additive Drawings')
+    parser.add_argument(
+        '--export', action='store_true',
+        help='Write the PDF, GraphML and .pos exports to disk instead of printing the positions'
+    )
+    args = parser.parse_args()
+
+    cxt = input('Path to .cxt file: ')
+    positions = run(cxt, export=args.export)
+    if positions is not None:
+        print(positions)
 
 
 if __name__ == "__main__":

@@ -44,7 +44,7 @@ uv sync
 
 Execute the layout generation using uv run to ensure the correct environment context.
 ```bash
-uv run python main.py
+uv run dim-flux
 ```
 
 The script will prompt you for a lattice number corresponding to the `.cxt` files located in the

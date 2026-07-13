@@ -2,7 +2,7 @@ import numpy as np
 
 from collections import deque 
 
-from src.utils.variables import Variables
+from dim_flux.utils.variables import Variables
 
 class InitLayout():
     '''

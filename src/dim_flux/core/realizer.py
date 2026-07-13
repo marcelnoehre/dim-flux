@@ -4,10 +4,10 @@ from pathlib import Path
 from odis import FormalContext
 from fcapy.lattice import ConceptLattice
 
-from src.utils.variables import Variables
-from src.fca.lattice import compute_lectic_order
-from src.dim_flux.projection import Projection
-from src.dim_flux.lgs import LinearEquationSolver
+from dim_flux.utils.variables import Variables
+from dim_flux.fca.lattice import compute_lectic_order
+from dim_flux.core.projection import Projection
+from dim_flux.core.lgs import LinearEquationSolver
 
 class Realizer():
     '''

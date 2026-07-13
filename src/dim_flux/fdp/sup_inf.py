@@ -3,8 +3,8 @@ from itertools import combinations
 from scipy.optimize import minimize
 from scipy.spatial.distance import pdist, squareform
 
-from src.fca.context import *
-from src.utils.variables import Variables
+from dim_flux.fca.context import *
+from dim_flux.utils.variables import Variables
 
 class SupInfGraph():
     '''

@@ -1,7 +1,7 @@
 import numpy as np
 
-from src.fca.lattice import compute_lectic_order
-from src.utils.variables import Variables
+from dim_flux.fca.lattice import compute_lectic_order
+from dim_flux.utils.variables import Variables
 
 class Projection():
     def __init__(self,

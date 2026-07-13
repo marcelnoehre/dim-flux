@@ -4,8 +4,8 @@ from typing import Tuple
 from itertools import chain
 from scipy.optimize import minimize
 
-from src.utils.variables import Variables
-from src.fca.lattice import cover_relations
+from dim_flux.utils.variables import Variables
+from dim_flux.fca.lattice import cover_relations
 
 class ForceDirectedPlacement():
     '''

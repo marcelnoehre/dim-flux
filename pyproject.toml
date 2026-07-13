@@ -1,3 +1,7 @@
+[build-system]
+requires = ["uv_build>=0.9.15,<0.10.0"]
+build-backend = "uv_build"
+
 [project]
 name = "dim-flux"
 version = "1.0.0"
@@ -14,10 +18,16 @@ classifiers = [
 ]
 dependencies = [
     "fcapy>=0.1.4.5",
+    "matplotlib>=3.10.0",
     "networkx>=3.6.1",
     "numpy>=2.4.2",
     "odis-python>=2026.4.0",
+    "pandas>=2.3.0",
     "python-sat>=1.8.dev30",
+    "scipy>=1.16.0",
     "sympy>=1.14.0",
     "z3-solver>=4.16.0.0",
 ]
+
+[project.scripts]
+dim-flux = "dim_flux.cli:main"

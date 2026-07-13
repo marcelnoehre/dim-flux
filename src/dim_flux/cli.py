@@ -1,9 +1,9 @@
-from src.utils.visualize import *
-from src.utils.variables import Variables
-from src.dim_flux.realizer import Realizer
-from src.fdp.sup_inf import SupInfGraph
-from src.fdp.init_layout import InitLayout
-from src.fdp.forces import ForceDirectedPlacement
+from dim_flux.utils.visualize import *
+from dim_flux.utils.variables import Variables
+from dim_flux.core.realizer import Realizer
+from dim_flux.fdp.sup_inf import SupInfGraph
+from dim_flux.fdp.init_layout import InitLayout
+from dim_flux.fdp.forces import ForceDirectedPlacement
 
 def main():
     cxt = input('File Number:')

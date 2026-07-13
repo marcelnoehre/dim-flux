@@ -2,7 +2,7 @@ import numpy as np
 
 from typing import Dict
 from collections import deque
-from src.utils.variables import Variables
+from dim_flux.utils.variables import Variables
 from sympy import symbols, Eq, solve, sympify, linear_eq_to_matrix
 
 class LinearEquationSolver:

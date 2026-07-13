@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from itertools import combinations
-from src.utils.variables import Variables
-from src.fca.lattice import cover_relations
+from dim_flux.utils.variables import Variables
+from dim_flux.fca.lattice import cover_relations
 
 def plot_si_graph(vars: Variables):
     '''

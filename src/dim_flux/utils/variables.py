@@ -4,9 +4,9 @@ from typing import Optional
 from dataclasses import dataclass
 from fcapy.lattice import ConceptLattice
 
-from src.fca.context import *
-from src.fca.lattice import *
-from src.utils.parser import decode_cxt
+from dim_flux.fca.context import *
+from dim_flux.fca.lattice import *
+from dim_flux.utils.parser import decode_cxt
 
 @dataclass
 class Args:

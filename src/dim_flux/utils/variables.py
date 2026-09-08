@@ -87,6 +87,9 @@ class Variables():
         Attractive force weight
     w_grav : float
         Gravitational force weight
+    timeout : Optional[int]
+        Timeout in milliseconds for the DimDraw layout search. If None, the
+        search runs to a proven optimum, which can take very long on a large lattice
     order : List
         The processing order for layout optimization
     scalars : np.ndarray
@@ -105,7 +108,11 @@ class Variables():
         Dictionary storing the resultant forces after optimization
     '''
 
-    def __init__(self, cxt: Union[str, pd.DataFrame], args: Optional[Dict[str, bool]]):
+    def __init__(
+        self, cxt: Union[str, pd.DataFrame], args: Optional[Dict[str, bool]],
+        w_rep: float = 100.0, w_att: float = 1.0, w_grav: float = 30.0,
+        timeout: Optional[int] = 1000
+    ):
 
         if isinstance(cxt, pd.DataFrame):
             self.cxt = 'input'
@@ -170,9 +177,10 @@ class Variables():
         ]
 
         # weights
-        self.w_rep = 50.0
-        self.w_att = 1.0
-        self.w_grav = 30.0
+        self.w_rep = w_rep
+        self.w_att = w_att
+        self.w_grav = w_grav
+        self.timeout = timeout
 
         # global variables
         self.order = []

@@ -47,7 +47,7 @@ class Realizer():
             Original DimDraw coordinates.
         '''
         ctx = FormalContext.from_file(str(Path('input.cxt').resolve()))
-        drawing = ctx.draw("dimdraw")
+        drawing = ctx.draw("dimdraw", timeout_ms=self.vars.timeout)
         self.lectic_order = compute_lectic_order(self.vars)
         self.coordinates = {
             c: (np.array([drawing.nodes[i].x, drawing.nodes[i].y]) * -1 * np.array([np.sqrt(2), 1/np.sqrt(2)])).tolist()

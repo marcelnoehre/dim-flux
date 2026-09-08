@@ -11,7 +11,11 @@ from dim_flux.fdp.sup_inf import SupInfGraph
 from dim_flux.fdp.init_layout import InitLayout
 from dim_flux.fdp.forces import ForceDirectedPlacement
 
-def plot(cxt: Union[str, pd.DataFrame], export: bool = False) -> Optional[np.ndarray]:
+def plot(
+    cxt: Union[str, pd.DataFrame], export: bool = False,
+    w_rep: float = 100.0, w_att: float = 1.0, w_grav: float = 30.0,
+    timeout: Optional[int] = 1000
+) -> Optional[np.ndarray]:
     '''
     Run the DimFlux pipeline end to end.
 
@@ -22,6 +26,15 @@ def plot(cxt: Union[str, pd.DataFrame], export: bool = False) -> Optional[np.nda
     export : bool
         If True, write the PDF, GraphML and .pos exports to disk and return None.
         If False, skip all exports and return the computed positions instead.
+    w_rep : float
+        Repulsive force weight.
+    w_att : float
+        Attractive force weight.
+    w_grav : float
+        Gravitational force weight.
+    timeout : Optional[int]
+        Timeout in milliseconds for the DimDraw layout search. If None, the
+        search runs to a proven optimum, which can take very long on a large lattice.
 
     Returns
     -------
@@ -39,7 +52,7 @@ def plot(cxt: Union[str, pd.DataFrame], export: bool = False) -> Optional[np.nda
         'plot_combined_forces':  False,
         'plot_gradients':  False,
         'plot_origin':  False
-    })
+    }, w_rep=w_rep, w_att=w_att, w_grav=w_grav, timeout=timeout)
 
     mode = 'DimFlux' # 'PlanarityEnhancer'
 

@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "dim-flux"
-version = "1.0.5"
+version = "1.0.7"
 description = "DimFlux: Force-Based Doubly-Additive Drawings"
 authors = [
     { name = "marcelnoehre", email = "noehre@cs.uni-kassel.de" }

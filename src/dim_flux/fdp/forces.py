@@ -252,13 +252,14 @@ class ForceDirectedPlacement():
                     ##################################################
                     else:
                         # perpendicular distance
-                        A = np.abs(np.cross(w_1 - w, w_2 - w))
+                        d_1, d_2 = w_1 - w, w_2 - w
+                        cross = d_1[0] * d_2[1] - d_1[1] * d_2[0]
+                        A = np.abs(cross)
                         f = w_2 - w_1
                         dist = np.maximum(A / np.linalg.norm(f), 1e-3)
-                        
                         # (w_1 - w) \times (w_2 - w) \geq 0 -> w lies left of w_1w_2
                         # (w_1 - w) \times (w_2 - w) < 0 -> w lies right of w_1w_2
-                        l = 1 if np.cross(w_1 - w, w_2 - w) >= 0 else -1
+                        l = 1 if cross >= 0 else -1
 
                         # n_+(f)
                         x_f, y_f = f

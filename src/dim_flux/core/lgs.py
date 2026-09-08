@@ -1,3 +1,4 @@
+import re
 import numpy as np
 
 from typing import Dict
@@ -80,7 +81,7 @@ class LinearEquationSolver:
 
                 # insert values of already known variables
                 for k, v in self.vector_variables.items():
-                    sub_eq = sub_eq.replace(str(k), str(v))
+                    sub_eq = re.sub(re.escape(str(k)) + r'(?!\d)', str(v), sub_eq)
                 
                 # solve if no variables are left in the sub-equation
                 if not any(var in sub_eq for var in self.variables):
@@ -102,7 +103,10 @@ class LinearEquationSolver:
             # if a solution is found, update the variable values
             if solution:
                 for k, v in solution[0].items():
-                    self.vector_variables[str(k)] = float(v)
+                    try:
+                        self.vector_variables[str(k)] = float(v)
+                    except TypeError:
+                        self.vector_variables[str(k)] = 0.0
             
             # if no solution is found the variables cancel out -> assign 0 to all variables
             else:

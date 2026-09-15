@@ -14,7 +14,7 @@ from dim_flux.fdp.forces import ForceDirectedPlacement
 def plot(
     cxt: Union[str, pd.DataFrame], export: bool = False,
     w_rep: float = 100.0, w_att: float = 1.0, w_grav: float = 30.0,
-    timeout: Optional[int] = 1000
+    timeout_ms: Optional[int] = 1000
 ) -> Optional[np.ndarray]:
     '''
     Run the DimFlux pipeline end to end.
@@ -32,9 +32,12 @@ def plot(
         Attractive force weight.
     w_grav : float
         Gravitational force weight.
-    timeout : Optional[int]
-        Timeout in milliseconds for the DimDraw layout search. If None, the
-        search runs to a proven optimum, which can take very long on a large lattice.
+    timeout_ms : Optional[int]
+        Timeout in milliseconds for the DimDraw layout search and, as a
+        fallback, for the force-directed optimization. If no proven/optimal
+        result is found within this duration, the best result found so far
+        is kept. If None, both searches run to a proven/converged optimum,
+        which can take very long on a large lattice.
 
     Returns
     -------
@@ -52,7 +55,7 @@ def plot(
         'plot_combined_forces':  False,
         'plot_gradients':  False,
         'plot_origin':  False
-    }, w_rep=w_rep, w_att=w_att, w_grav=w_grav, timeout=timeout)
+    }, w_rep=w_rep, w_att=w_att, w_grav=w_grav, timeout_ms=timeout_ms)
 
     mode = 'DimFlux' # 'PlanarityEnhancer'
 

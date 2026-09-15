@@ -1,3 +1,4 @@
+import time
 import numpy as np
 
 from typing import Tuple
@@ -6,6 +7,9 @@ from scipy.optimize import minimize
 
 from dim_flux.utils.variables import Variables
 from dim_flux.fca.lattice import cover_relations
+
+class _OptimizationTimeout(Exception):
+    '''Raised internally to abort scipy.optimize.minimize once timeout_ms elapses.'''
 
 class ForceDirectedPlacement():
     '''
@@ -46,18 +50,38 @@ class ForceDirectedPlacement():
     def _optimize_layout(self):
         '''
         Compute an optimized layout by minimizing the total energy function
-        using the Conjugate Gradient (CG) method.
+        using the Conjugate Gradient (CG) method. If no optimum is found within
+        vars.timeout_ms milliseconds, the optimization is aborted and the best
+        (lowest energy) iterate found so far is kept instead.
         '''
-        res = minimize(
-            fun=self._total_energy_and_gradient,
-            x0=np.array([self.vars.base_vectors[v] for v in self.vars.elements]).flatten(),
-            method='CG',
-            jac=True,
-            options={'maxiter': 1000}
-        )
+        x0 = np.array([self.vars.base_vectors[v] for v in self.vars.elements]).flatten()
+
+        timeout_s = self.vars.timeout_ms / 1000 if self.vars.timeout_ms is not None else None
+        start = time.perf_counter()
+        best = {'x': x0, 'energy': np.inf}
+
+        def _on_iteration(xk):
+            if self.energy < best['energy']:
+                best['x'] = xk.copy()
+                best['energy'] = self.energy
+            if timeout_s is not None and (time.perf_counter() - start) > timeout_s:
+                raise _OptimizationTimeout()
+
+        try:
+            res = minimize(
+                fun=self._total_energy_and_gradient,
+                x0=x0,
+                method='CG',
+                jac=True,
+                options={'maxiter': 1000},
+                callback=_on_iteration
+            )
+            x_opt = res.x
+        except _OptimizationTimeout:
+            x_opt = best['x']
 
         # store optimized vectors
-        optimized_matrix = res.x.reshape(-1, 2)
+        optimized_matrix = x_opt.reshape(-1, 2)
         for i, v in enumerate(self.vars.elements):
             self.vars.base_vectors[v] = optimized_matrix[i]
 

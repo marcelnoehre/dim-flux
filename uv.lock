@@ -203,7 +203,7 @@ wheels = [
 
 [[package]]
 name = "dim-flux"
-version = "1.0.5"
+version = "1.0.9"
 source = { editable = "." }
 dependencies = [
     { name = "fcapy" },

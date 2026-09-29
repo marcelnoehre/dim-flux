@@ -59,6 +59,8 @@ class SupInfGraph():
             )
             for i in range(self.vars.N_e)
         }
+        # restrict to irreducible elements
+        S = {i: (A & self.vars.G, B & self.vars.M) for i, (A, B) in S.items()}
 
         for i, j in combinations(range(self.vars.N_e), 2):
             # g_i, g_j
@@ -68,7 +70,7 @@ class SupInfGraph():
                     # g_i'' \cap g_j''
                     inf = S[i][0] & S[j][0]
                     # (g_i \cup g_j)''
-                    sup = object_closure(self.vars.context, (S[i][0] | S[j][0]))
+                    sup = object_closure(self.vars.context, (S[i][0] | S[j][0])) & self.vars.G
                     # |Sup_g| - |Inf_g| - 1
                     self.dsi_matrix[i, j] = self.dsi_matrix[j, i] = len(sup) - len(inf) - 1
                 
@@ -79,7 +81,7 @@ class SupInfGraph():
                     # m_i'' \cap m_j''
                     sup = S[i][1] & S[j][1]
                     # (m_i \cup m_j)''
-                    inf = attribute_closure(self.vars.context, S[i][1] | S[j][1])
+                    inf = attribute_closure(self.vars.context, S[i][1] | S[j][1]) & self.vars.M
                     # |Sup_m| |Inf_m| - 1
                     self.dsi_matrix[i, j] = self.dsi_matrix[j, i] = len(inf) - len(sup) - 1
             
@@ -92,9 +94,9 @@ class SupInfGraph():
                     # m_i'' \cap m_j''
                     sup_m = S[i][1] & S[j][1]
                     # (g_i \cup g_j)''
-                    sup_g = object_closure(self.vars.context, S[i][0] | S[j][0])
+                    sup_g = object_closure(self.vars.context, S[i][0] | S[j][0]) & self.vars.G
                     # (m_i \cup m_j)''
-                    inf_m = attribute_closure(self.vars.context, S[i][1] | S[j][1])
+                    inf_m = attribute_closure(self.vars.context, S[i][1] | S[j][1]) & self.vars.M
                     # (|Sup_g| - |Sup_m|) (|Inf_g| - |Inf_m|) - 1
                     self.dsi_matrix[i, j] = self.dsi_matrix[j, i] = (len(inf_g) - len(sup_m)) - (len(sup_g) - len(inf_m)) - 1
 

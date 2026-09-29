@@ -195,8 +195,8 @@ def graphml_export(vars: Variables, prefix: str):
             concept,
             x=float(x),
             y=float(y),
-            extent=','.join(vars.extents[concept]),
-            intent=','.join(vars.intents[concept])
+            extent=','.join(map(str, vars.full_extents[concept])),
+            intent=','.join(map(str, vars.full_intents[concept]))
         )
     graph.add_edges_from(cover_relations(vars.lattice))
 

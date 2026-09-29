@@ -41,42 +41,50 @@ class Variables():
         The concept lattice derived from the context
     args : Args
         Configuration object for visualization settings
+    join_irreducibles : Dict[int, str]
+        Mapping of join-irreducible concept IDs to their representative object
+    meet_irreducibles : Dict[int, str]
+        Mapping of meet-irreducible concept IDs to their representative attribute
     objects : List[str]
-        List of object names in the context
+        List of irreducible objects (one representative per join-irreducible concept)
     object_map : Dict[str, int]
-        Mapping of object names to their integer indices
+        Mapping of irreducible object names to their integer indices
     object_closures : Dict[str, Set[str]]
-        Mapping of objects to their closure sets
+        Mapping of irreducible objects to their closure sets restricted to G
     N_g : int
-        The number of objects in the context
+        The number of irreducible objects
     G : Set[str]
-        The set of all object names
+        The set of irreducible object names
     attributes : List[str]
-        List of attribute names in the context
+        List of irreducible attributes (one representative per meet-irreducible concept)
     attribute_map : Dict[str, int]
-        Mapping of attribute names to their integer indices
+        Mapping of irreducible attribute names to their integer indices
     attribute_closures : Dict[str, Set[str]]
-        Mapping of attributes to their closure sets
+        Mapping of irreducible attributes to their closure sets restricted to M
     N_m : int
-        The number of attributes in the context
+        The number of irreducible attributes
     M : Set[str]
-        The set of all attribute names
+        The set of irreducible attribute names
     elements : List[str]
-        Concatenated list of objects and attributes
+        Concatenated list of irreducible objects and attributes, the vectors the forces act on
     element_map : Dict[str, int]
         Mapping of element names to their integer indices
     N_e : int
-        Total number of elements (objects + attributes)
+        Total number of elements (irreducible objects + attributes)
     E : Set[str]
         The set of all elements
     concepts : List[int]
         List of concept IDs from the lattice
     N_c : int
         Total number of concepts in the lattice
+    full_extents : Dict[int, Set[str]]
+        Mapping of concept IDs to their extents in the original context
+    full_intents : Dict[int, Set[str]]
+        Mapping of concept IDs to their intents in the original context
     extents : Dict[int, Set[str]]
-        Mapping of concept IDs to their extents
+        Mapping of concept IDs to their extents restricted to G
     intents : Dict[int, Set[str]]
-        Mapping of concept IDs to their intents
+        Mapping of concept IDs to their intents restricted to M
     atoms : List[str]
         Objects belonging to concepts directly above the bottom concept
     coatoms : List[str]
@@ -126,35 +134,35 @@ class Variables():
             self.context = decode_cxt(cxt)
             self.cxt = Path(cxt).stem
 
-        # reduce context
-        reduced = reduce_context(self.context).to_pandas()
-        reduced.index = [f'g_{i + 1}' for i in range(len(reduced.index))]
-        reduced.columns = [f'm_{i + 1}' for i in range(len(reduced.columns))]
-        self.context = FormalContext.from_pandas(reduced)
-        self.context.write_cxt('input.cxt')
-
         self.lattice = ConceptLattice.from_context(self.context)
         self.args: Args = Args(**(args or {}))
 
+        # irreducible representatives, forces act on these instead of all objects and attributes
+        self.join_irreducibles, self.meet_irreducibles = irreducible_representatives(
+            self.lattice, self.context.object_names, self.context.attribute_names
+        )
+        irreducible_objects = set(self.join_irreducibles.values())
+        irreducible_attributes = set(self.meet_irreducibles.values())
+
         # objects
-        self.objects = self.context.object_names
-        self.object_map = self.context._object_names_i_map
+        self.objects = [g for g in self.context.object_names if g in irreducible_objects]
+        self.object_map = {g: i for i, g in enumerate(self.objects)}
+        self.N_g = len(self.objects)
+        self.G = set(self.objects)
         self.object_closures = {
-            g: object_closure(self.context, {g})
+            g: object_closure(self.context, {g}) & self.G
             for g in self.objects
         }
-        self.N_g = self.context.n_objects
-        self.G = set(self.objects)
-        
+
         # attributes
-        self.attributes = self.context.attribute_names
-        self.attribute_map = self.context._attribute_names_i_map
+        self.attributes = [m for m in self.context.attribute_names if m in irreducible_attributes]
+        self.attribute_map = {m: i for i, m in enumerate(self.attributes)}
+        self.N_m = len(self.attributes)
+        self.M = set(self.attributes)
         self.attribute_closures = {
-            m: attribute_closure(self.context, {m})
+            m: attribute_closure(self.context, {m}) & self.M
             for m in self.attributes
         }
-        self.N_m = self.context.n_attributes
-        self.M = set(self.attributes)
 
         # elements
         self.elements = self.objects + self.attributes
@@ -168,14 +176,16 @@ class Variables():
         # concepts
         self.concepts = self.lattice.to_networkx().nodes
         self.N_c = len(self.concepts)
-        self.extents = all_extents(self.lattice)
-        self.intents = all_intents(self.lattice)
+        self.full_extents = all_extents(self.lattice)
+        self.full_intents = all_intents(self.lattice)
+        self.extents = {c: e & self.G for c, e in self.full_extents.items()}
+        self.intents = {c: i & self.M for c, i in self.full_intents.items()}
         self.atoms = [
-            next(iter(self.lattice.get_concept_new_extent(c)))
+            self.join_irreducibles[c]
             for c in self.lattice.parents(self.N_c - 1)
         ]
         self.coatoms = [
-            next(iter(self.lattice.get_concept_new_intent(c)))
+            self.meet_irreducibles[c]
             for c in self.lattice.children(0)
         ]
 

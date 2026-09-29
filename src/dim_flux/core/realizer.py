@@ -1,8 +1,6 @@
 import numpy as np
-from pathlib import Path
 
 from odis import FormalContext
-from fcapy.lattice import ConceptLattice
 
 from dim_flux.utils.variables import Variables
 from dim_flux.fca.lattice import compute_lectic_order
@@ -28,7 +26,6 @@ class Realizer():
         ):
         self.vars = variables
         self.context = variables.context
-        self.lattice = ConceptLattice.from_context(variables.context)
         
         self.coordinates = self.two_dimensional_extension()
         self.vars.coordinates = self.coordinates
@@ -46,7 +43,13 @@ class Realizer():
         coordinates : Dict[int, List]
             Original DimDraw coordinates.
         '''
-        ctx = FormalContext.from_file(str(Path('input.cxt').resolve()))
+        # reduced context on the irreducible elements, indexed names keep odis independent of the labels
+        ctx = FormalContext()
+        for m in self.vars.attributes:
+            ctx.add_attribute(f'm_{self.vars.attribute_map[m]}')
+        for g in self.vars.objects:
+            g_intent = self.vars.M & set(self.context.intention([g]))
+            ctx.add_object(f'g_{self.vars.object_map[g]}', [f'm_{self.vars.attribute_map[m]}' for m in g_intent])
         drawing = ctx.draw("dimdraw", timeout_ms=self.vars.timeout_ms)
         self.lectic_order = compute_lectic_order(self.vars)
         self.coordinates = {
@@ -65,6 +68,6 @@ class Realizer():
             self.base_vectors = dict({})
             for v in self.vars.elements:
                 if v in self.vars.G:
-                    self.base_vectors[v] = np.array([vector_vars[f'x_{v}'], vector_vars[f'y_{v}']])
+                    self.base_vectors[v] = np.array([vector_vars[lgs.symbol('x', v)], vector_vars[lgs.symbol('y', v)]])
                 else:
-                    self.base_vectors[v] = np.array([-vector_vars[f'x_{v}'], -vector_vars[f'y_{v}']])
+                    self.base_vectors[v] = np.array([-vector_vars[lgs.symbol('x', v)], -vector_vars[lgs.symbol('y', v)]])

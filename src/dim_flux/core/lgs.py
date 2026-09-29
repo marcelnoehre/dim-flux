@@ -25,13 +25,32 @@ class LinearEquationSolver:
         self.coordinates = coordinates
         self.dimensions = ['x', 'y']
 
-        self.variables=[f'{dim}_{v}' for dim in self.dimensions for v in self.vars.objects + self.vars.attributes]
+        self.variables=[self.symbol(dim, v) for dim in self.dimensions for v in self.vars.elements]
         self.symbols = symbols(' '.join(self.variables))
 
         self._construct_equations()
         self.solution = solve(self.equations, self.symbols, dict=True)
         if not self.solution:
             self._solve_approximate()
+
+    def symbol(self, dim: str, element: str) -> str:
+        '''
+        Name of the sympy variable for an element, based on its index so that
+        arbitrary object and attribute labels are valid symbols.
+
+        Parameters
+        ----------
+        dim : str
+            The dimension ('x' or 'y')
+        element : str
+            The object or attribute
+
+        Returns
+        -------
+        symbol : str
+            The variable name
+        '''
+        return f'{dim}_e{self.vars.element_map[element]}'
 
     def _solve_approximate(self):
         A, b = linear_eq_to_matrix(self.equations, self.symbols)
@@ -44,7 +63,7 @@ class LinearEquationSolver:
         for c in self.vars.concepts:
             elements = self.vars.extents[c] | (self.vars.M - self.vars.intents[c])
             for i, dim in enumerate(self.dimensions):
-                l, r = tuple(((' + '.join(f'{dim}_{v}' for v in elements) if elements else '0'), f'{self.coordinates[c][i]}'))
+                l, r = tuple(((' + '.join(self.symbol(dim, v) for v in elements) if elements else '0'), f'{self.coordinates[c][i]}'))
                 eq = Eq(sympify(l), sympify(r))
                 if eq != True:
                     self.equations.append(eq)
@@ -65,7 +84,7 @@ class LinearEquationSolver:
         eq = [] # construct equation to solve
 
         for var in self.vars.extents[node] | (self.vars.M - self.vars.intents[node]):
-            var = f'{dim}_{var}'
+            var = self.symbol(dim, var)
 
             # if variable value is already known, insert it directly
             if var in self.vector_variables:
@@ -147,7 +166,7 @@ class LinearEquationSolver:
 
             # solve dimensions separately
             for i, dim in enumerate(self.dimensions):
-                while not all(f'{dim}_{var}' in self.vector_variables.keys()
+                while not all(self.symbol(dim, var) in self.vector_variables.keys()
                     for var in self.vars.extents[node] | (self.vars.M - self.vars.intents[node])
                 ):              
                     self._solve(dim, node, self.coordinates[node][i])

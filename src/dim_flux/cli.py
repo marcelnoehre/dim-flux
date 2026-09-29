@@ -2,7 +2,6 @@ import argparse
 import numpy as np
 import pandas as pd
 
-from pathlib import Path
 from typing import Optional, Union
 from dim_flux.utils.visualize import *
 from dim_flux.utils.variables import Variables
@@ -105,7 +104,6 @@ def plot(
         pos_export(vars, vars.cxt)
 
     positions = np.array([vars.coordinates[c] for c in vars.lectic_order])
-    Path('input.cxt').unlink(missing_ok=True)
     return positions
 
 

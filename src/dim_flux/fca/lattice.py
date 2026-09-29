@@ -1,6 +1,6 @@
 import networkx as nx
 
-from typing import Tuple, Set, Dict
+from typing import Tuple, Set, Dict, List
 from collections import deque 
 from fcapy.lattice import ConceptLattice
 
@@ -99,6 +99,48 @@ def all_intents(
             queue.append(concept)
 
     return intents
+
+def irreducible_representatives(
+        lattice: ConceptLattice,
+        objects: List[str],
+        attributes: List[str]
+    ) -> Tuple[Dict[int, str], Dict[int, str]]:
+    '''
+    Pick one representative object for every join-irreducible concept and one
+    representative attribute for every meet-irreducible concept. Restricting the
+    context to these representatives yields the reduced context.
+
+    Parameters
+    ----------
+    lattice : ConceptLattice
+        The concept lattice
+    objects : List[str]
+        All objects in context order, the first object of a concept is its representative
+    attributes : List[str]
+        All attributes in context order, the first attribute of a concept is its representative
+
+    Returns
+    -------
+    join_irreducibles : Dict[int, str]
+        Mapping of join-irreducible concept IDs to their representative object
+    meet_irreducibles : Dict[int, str]
+        Mapping of meet-irreducible concept IDs to their representative attribute
+    '''
+    object_index = {g: i for i, g in enumerate(objects)}
+    attribute_index = {m: i for i, m in enumerate(attributes)}
+    join_irreducibles = dict({})
+    meet_irreducibles = dict({})
+
+    for c in lattice.to_networkx().nodes:
+        # exactly one lower neighbor
+        if len(lattice.children(c)) == 1:
+            join_irreducibles[c] = min(lattice.get_concept_new_extent(c), key=object_index.get)
+
+        # exactly one upper neighbor
+        if len(lattice.parents(c)) == 1:
+            meet_irreducibles[c] = min(lattice.get_concept_new_intent(c), key=attribute_index.get)
+
+    return join_irreducibles, meet_irreducibles
 
 def incomparability_graph(lattice: ConceptLattice) -> nx.Graph:
     '''
